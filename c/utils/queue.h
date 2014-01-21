@@ -4,12 +4,18 @@
 /**
  ** Structure
  */
-typedef struct                   queue
+typedef struct                   queueElt
 {
   void*                          data;
-  struct queue*                  prev;
-  struct queue*                  next;
-}                                queue;
+  struct queueElt*               next;
+}                                queueElt;
+
+typedef struct                   queueHead
+{
+  struct queueElt*               first;
+  struct queueElt*               last;
+  unsigned int                   nbElt;
+}                                queueHead;
 
 
 /**
@@ -21,7 +27,7 @@ typedef struct                   queue
  **
  ** \return An initialized queue structure or NULL.
  */
-queue*                queueCreate(void);
+queueHead*            queueCreate(void);
 
 /**
  ** Add a new element to an existing queue.
@@ -31,7 +37,7 @@ queue*                queueCreate(void);
  **
  ** \return 1 if ok, else 0.
  */
-int                   queueAdd(queue*                        queueHead,
+int                   queueAdd(queueHead*                    queue,
                                void*                         elt);
 
 /**
@@ -41,13 +47,14 @@ int                   queueAdd(queue*                        queueHead,
  **
  ** \return The older object in the queue.
  */
-void*                 queueRemove(queue*                     queueHead);
+void*                 queueRemove(queueHead*                 queue);
 
 /**
  ** Free a queue object properly
  **
  ** \param  queue       The queue object.
  */
-void                  queueFree(queue*                       queueHead);
+void                  queueFree(queueHead*                   queue);
+
 
 #endif /* UTILS__QUEUE_H_ */

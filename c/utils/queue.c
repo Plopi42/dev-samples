@@ -5,90 +5,94 @@
 #include <err.h>
 
 
-queue*                queueCreate(void)
+queueHead*            queueCreate(void)
 {
-  queue*              result;
+  queueHead*          result;
 
-  if (!(result = malloc(sizeof(queue))))
-    errx(EXIT_FAILURE, "ERROR: Cannot allocate memory for queue");
+  if (!(result = malloc(sizeof(queueHead))))
+    errx(EXIT_FAILURE, "ERROR: Cannot allocate memory for queue head");
 
-  memset(result, 0, sizeof(queue));
+  memset(result, 0, sizeof(queueHead));
 
   return result;
 }
 
-int                   queueAdd(queue*                        queueHead,
+int                   queueAdd(queueHead*                    queue,
                                void*                         elt)
 {
-  queue*              newElt;
+  queueElt*           newElt;
 
-  if (!queueHead)
+  if (!queue)
     errx(EXIT_FAILURE, "ERROR: NULL queue");
 
-  newElt       = queueCreate();
-  newElt->data = elt;
+  if (!(newElt = malloc(sizeof(queueElt))))
+    errx(EXIT_FAILURE, "ERROR: Cannot allocate memory for queue element");
 
-  if (!queueHead->next) /* No element */
+  newElt->data = elt;
+  newElt->next = NULL;
+
+  if (!queue->first || !queue->last) /* No element */
   {
-    if (!!queueHead->prev)
+    if (queue->last != queue->first)
     {
       warnx("ERROR: Invalid state for queue");
       return 0;
     }
 
-    queueHead->prev  = newElt;
-    queueHead->next  = newElt;
+    queue->first = newElt;
+    queue->last  = newElt;
+    queue->nbElt = 1;
 
     return 1;
   }
 
-  newElt->next       = queueHead->next;
-  newElt->next->prev = newElt;
-  queueHead->next    = newElt;
+  queue->last->next = newElt;
+  queue->last       = newElt;
+  queue->nbElt     += 1;
 
   return 1;
 }
 
-void*                 queueRemove(queue*                     queueHead)
+void*                 queueRemove(queueHead*                 queue)
 {
   void*               result;
-  queue*              tmp;
+  queueElt*           tmp;
 
-  if (!queueHead)
+  if (!queue)
     errx(EXIT_FAILURE, "ERROR: NULL queue");
 
-  if (!queueHead->prev) /* No element */
+  if (!queue->first) /* No element */
     return NULL;
 
-  tmp             = queueHead->prev;
-  result          = tmp->data;
-  queueHead->prev = tmp->prev;
+  tmp               = queue->first;
+  result            = tmp->data;
+  queue->first      = tmp->next;
+  queue->nbElt     -= 1;
 
-  if (!tmp->prev)
-    queueHead->next = NULL;
-  else
-    tmp->prev->next = NULL;
-
+  if (!queue->first)
+  {
+    queue->last     = NULL;
+    queue->nbElt    = 0;
+  }
 
   free(tmp);
 
   return result;
 }
 
-void                  queueFree(queue*                       queueHead)
+void                  queueFree(queueHead*                   queue)
 {
-  if (!queueHead)
+  if (!queue)
     errx(EXIT_FAILURE, "ERROR: NULL queue");
 
-  while (!!queueHead->next)
+  while (!!queue->first)
   {
-    queueHead->prev = queueHead->next;
-    queueHead->next = queueHead->next->next;
+    queue->last  = queue->first;
+    queue->first = queue->last->next;
 
-    free(queueHead->prev);
+    free(queue->last);
   }
 
-  memset(queueHead, 0, sizeof(queue));
-
-  free(queueHead);
+  memset(queue, 0, sizeof(queueHead));
+  free(queue);
 }
