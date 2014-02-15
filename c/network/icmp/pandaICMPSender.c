@@ -245,7 +245,9 @@ options*   optionsParse(int      argc,
                         char**   argv)
 {
   int                            i;
-  options*                       options = securedMalloc(sizeof(options));
+  options*                       result;
+
+  result = securedMalloc(sizeof(options));
 
   for (i = 1; i < argc; ++i)
   {
@@ -254,30 +256,43 @@ options*   optionsParse(int      argc,
       switch (argv[i][1])
       {
       case 'd':
-        if (i++ < argc)
-          options->dstAddr = argv[i];
+        if (++i < argc)
+          result->dstAddr = argv[i];
         else
+        {
+          free(result);
           usage();
+        }
         break;
       case 's':
-        if (i++ < argc)
-          options->srcAddr = argv[i];
+        if (++i < argc)
+          result->srcAddr = argv[i];
         else
+        {
+          free(result);
           usage();
+        }
         break;
       case 'i':
-        if (i++ < argc)
-          options->iface = argv[i];
+        if (++i < argc)
+          result->iface = argv[i];
         else
+        {
+          free(result);
           usage();
+        }
         break;
       case 'm':
-        if (i++ < argc)
-          options->data = argv[i];
+        if (++i < argc)
+          result->data = argv[i];
         else
+        {
+          free(result);
           usage();
+        }
         break;
       default:
+        free(result);
         usage();
         break;
       }
@@ -285,24 +300,28 @@ options*   optionsParse(int      argc,
     else
     {
       /* Nothing here yet */
+      free(result);
       usage();
     }
   }
 
   /* Check if mandatory option has been submitted */
-  if (!options->dstAddr)
+  if (!result->dstAddr)
+  {
+    free(result);
     usage();
+  }
 
 #if DEBUG
   printf("Starting with options:\n"
      " Destination: %s\n"
      " Interface:   %s\n"
      " Source:      %s\n",
-     options->dstAddr,
-     options->iface,
-     options->srcAddr);
+     result->dstAddr,
+     result->iface,
+     result->srcAddr);
 #endif
-  return options;
+  return result;
 }
 
 void       printIp(in_addr*      ip)
@@ -361,7 +380,7 @@ u_char*    ipPkt(u_int8_t        l3protocol,
   iphdr->ip_v   = 4;                                /* version */
   iphdr->ip_hl  = sizeof(struct ip) >> 2;           /* header length */
   iphdr->ip_tos = 0;                                /* type of service */
-  iphdr->ip_len = sizeof(struct ip) + l3packetLen;  /* total length */
+  iphdr->ip_len = htons(sizeof(struct ip) + l3packetLen);  /* total length */
   iphdr->ip_id  = 0x4242;                           /* identification */
   iphdr->ip_off = 0;                                /* fragment offset field */
   iphdr->ip_ttl = 120;                              /* time to live */
@@ -472,7 +491,7 @@ int        resolv(char*          addr,
     }
   }
 
-  /*BUG:freeaddrinfo(result);*//* No longer needed */
+  freeaddrinfo(result);/* No longer needed */
   return 1;
 }
 
