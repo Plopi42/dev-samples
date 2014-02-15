@@ -26,12 +26,17 @@ int                   main(void)
   assert(1    == (queueAdd(queue, &i4)));      /* Insert 4 */
 
   /* Check the queue */
+  assert(1    == (*(int*)queueFirst(queue)));  /* Check  1 */
   assert(1    == (*(int*)queueRemove(queue))); /* Remove 1 */
+  assert(2    == (*(int*)queueFirst(queue)));  /* Check  2 */
   assert(2    == (*(int*)queueRemove(queue))); /* Remove 2 */
+  assert(3    == (*(int*)queueFirst(queue)));  /* Check  3 */
   assert(3    == (*(int*)queueRemove(queue))); /* Remove 3 */
+  assert(4    == (*(int*)queueFirst(queue)));  /* Check  4 */
   assert(4    == (*(int*)queueRemove(queue))); /* Remove 4 */
 
-  assert(NULL    == (queueRemove(queue)));     /* Queue is empty */
+  assert(NULL == (queueFirst(queue)));         /* Check empty    */
+  assert(NULL == (queueRemove(queue)));        /* Queue is empty */
 
   /* Clear the queue */
   queueFree(queue);
@@ -55,6 +60,7 @@ int                   main(void)
   assert(2    == (*(int*)queueRemove(queue))); /* Remove 2 */
 
   assert(1    == (queueAdd(queue, &i1)));      /* Insert 1 */
+  assert(1    == (*(int*)queueFirst(queue)));  /* Check  1 */
   assert(1    == (queueAdd(queue, &i2)));      /* Insert 2 */
   assert(1    == (*(int*)queueRemove(queue))); /* Remove 1 */
   assert(1    == (queueAdd(queue, &i3)));      /* Insert 3 */
@@ -72,11 +78,13 @@ int                   main(void)
 
   /* Check the queue */
   assert(1    == (*(int*)queueRemove(queue))); /* Remove 1 */
+  assert(2    == (*(int*)queueFirst(queue)));  /* Check  2 */
   assert(2    == (*(int*)queueRemove(queue))); /* Remove 2 */
   assert(3    == (*(int*)queueRemove(queue))); /* Remove 3 */
   assert(4    == (*(int*)queueRemove(queue))); /* Remove 4 */
 
-  assert(NULL    == (queueRemove(queue)));     /* Queue is empty */
+  assert(NULL == (queueFirst(queue)));         /* Check empty    */
+  assert(NULL == (queueRemove(queue)));        /* Queue is empty */
 
   /* Clear the queue */
   queueFree(queue);

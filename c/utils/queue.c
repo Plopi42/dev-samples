@@ -80,6 +80,17 @@ void*                 queueRemove(queueHead*                 queue)
   return result;
 }
 
+void*                 queueFirst(queueHead*                  queue)
+{
+  if (!queue)
+    errx(EXIT_FAILURE, "ERROR: NULL queue");
+
+  if (!queue->first) /* No element */
+    return NULL;
+
+  return queue->first->data;
+}
+
 void                  queueFree(queueHead*                   queue)
 {
   if (!queue)

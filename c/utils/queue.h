@@ -50,6 +50,15 @@ int                   queueAdd(queueHead*                    queue,
 void*                 queueRemove(queueHead*                 queue);
 
 /**
+ ** Return the older element in the queue.
+ **
+ ** \param  queue       The queue object.
+ **
+ ** \return The older object in the queue.
+ */
+void*                 queueFirst(queueHead*                  queue);
+
+/**
  ** Free a queue object properly
  **
  ** \param  queue       The queue object.
